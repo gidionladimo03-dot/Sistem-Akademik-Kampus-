@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penilaian & Manajemen Akademik Kampus</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- Container Utama -->
+    <div class="min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-blue-800 text-white shadow-md">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-2 rounded-lg">
+                        <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Akademika Web</h1>
+                        <p class="text-xs text-blue-200">Sistem Manajemen Nilai & Absensi Mahasiswa</p>
+                    </div>
+                </div>
+                <div class="text-sm bg-blue-700 px-3 py-1.5 rounded-md">
+                    <i class="fa-regular fa-calendar-days mr-2"></i> Semester Genap 2025/2026
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-6 py-8 flex-grow">
+            
+            <!-- Statistik Ringkas -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                    <div class="bg-blue-50 text-blue-600 p-4 rounded-lg mr-4 text-xl"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Mahasiswa</p>
+                        <h3 id="statTotal" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-lg mr-4 text-xl"><i class="fa-solid fa-award"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Rata-rata Nilai Kelas</p>
+                        <h3 id="statRataRata" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                    <div class="bg-amber-50 text-amber-600 p-4 rounded-lg mr-4 text-xl"><i class="fa-solid fa-book-open"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Mata Kuliah</p>
+                        <h3 class="text-2xl font-bold">Pemrograman Web</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                    <div class="bg-purple-50 text-purple-600 p-4 rounded-lg mr-4 text-xl"><i class="fa-solid fa-user-check"></i></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status Kehadiran</p>
+                        <h3 class="text-2xl font-bold">Aktif</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bagian Aksi & Tabel -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-2 w-full md:w-auto">
+                        <div class="relative w-full md:w-72">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" id="inputCari" onkeyup="cariMahasiswa()" placeholder="Cari nama atau NIM..." class="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <button onclick="bukaModalTambah()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2 cursor-pointer w-full md:w-auto justify-center">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Tambah Mahasiswa & Nilai</span>
+                    </button>
+                </div>
+
+                <!-- Tabel Data -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-100">
+                                <th class="p-4 font-semibold">NIM</th>
+                                <th class="p-4 font-semibold">Nama Mahasiswa</th>
+                                <th class="p-4 font-semibold text-center">Tugas (30%)</th>
+                                <th class="p-4 font-semibold text-center">UTS (30%)</th>
+                                <th class="p-4 font-semibold text-center">UAS (40%)</th>
+                                <th class="p-4 font-semibold text-center">Nilai Akhir</th>
+                                <th class="p-4 font-semibold text-center">Mutu</th>
+                                <th class="p-4 font-semibold text-center">Kehadiran</th>
+                                <th class="p-4 font-semibold text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelMahasiswa" class="divide-y divide-gray-100 text-sm">
+                            <!-- Data akan dimuat melalui JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+            &copy; 2026 Akademika Web. Tugas Kuliah Sistem Informasi / Pemrograman Web.
+        </footer>
+    </div>
+
+    <!-- Modal Form Tambah/Edit -->
+    <div id="modalMahasiswa" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden">
+            <div class="bg-blue-800 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-lg">Tambah Data Mahasiswa</h3>
+                <button onclick="tutupModal()" class="text-blue-200 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="formMahasiswa" onsubmit="simpanData(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editIndex" value="-1">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">NIM</label>
+                    <input type="text" id="nim" required placeholder="Contoh: 22040101" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nama Lengkap</label>
+                    <input type="text" id="nama" required placeholder="Contoh: Budi Santoso" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nilai Tugas (30%)</label>
+                        <input type="number" id="tugas" min="0" max="100" required placeholder="0-100" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nilai UTS (30%)</label>
+                        <input type="number" id="uts" min="0" max="100" required placeholder="0-100" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nilai UAS (40%)</label>
+                        <input type="number" id="uas" min="0" max="100" required placeholder="0-100" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kehadiran</label>
+                    <select id="kehadiran" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Sangat Baik (100%)">Sangat Baik (100%)</option>
+                        <option value="Baik (85-95%)">Baik (85-95%)</option>
+                        <option value="Cukup (<80%)">Cukup (&lt;80%)</option>
+                        <option value="Kurang (<70%)">Kurang (&lt;70%)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="tutupModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium cursor-pointer">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Aplikasi -->
+    <script>
+        // Data awal (Dummy data agar saat dibuka langsung ada isinya untuk presentasi)
+        let dataMahasiswa = JSON.parse(localStorage.getItem('db_mahasiswa')) || [
+            { nim: '220102001', nama: 'Andi Pratama', tugas: 85, uts: 80, uas: 90, kehadiran: 'Sangat Baik (100%)' },
+            { nim: '220102002', nama: 'Siti Rahmawati', tugas: 90, uts: 88, uas: 85, kehadiran: 'Sangat Baik (100%)' },
+            { nim: '220102003', nama: 'Joko Susilo', tugas: 70, uts: 65, uas: 60, kehadiran: 'Cukup (<80%)' },
+            { nim: '220102004', nama: 'Dewi Lestari', tugas: 95, uts: 92, uas: 94, kehadiran: 'Sangat Baik (100%)' }
+        ];
+
+        // Hitung nilai akhir dan huruf mutu
+        function hitungNilai(tugas, uts, uas) {
+            let akhir = (tugas * 0.3) + (uts * 0.3) + (uas * 0.4);
+            let huruf = 'E';
+            let warna = 'bg-red-100 text-red-700';
+
+            if (akhir >= 85) { huruf = 'A'; warna = 'bg-emerald-100 text-emerald-700'; }
+            else if (akhir >= 75) { huruf = 'B'; warna = 'bg-blue-100 text-blue-700'; }
+            else if (akhir >= 65) { huruf = 'C'; warna = 'bg-amber-100 text-amber-700'; }
+            else if (akhir >= 50) { huruf = 'D'; warna = 'bg-orange-100 text-orange-700'; }
+
+            return { akhir: akhir.toFixed(1), huruf, warna };
+        }
+
+        // Render data ke tabel
+        function renderTabel(data = dataMahasiswa) {
+            const tbody = document.getElementById('tabelMahasiswa');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-gray-400">Belum ada data mahasiswa.</td></tr>`;
+                document.getElementById('statTotal').innerText = 0;
+                document.getElementById('statRataRata').innerText = 0;
+                return;
+            }
+
+            let totalAkhir = 0;
+
+            data.forEach((mhs, index) => {
+                let res = hitungNilai(mhs.tugas, mhs.uts, mhs.uas);
+                totalAkhir += parseFloat(res.akhir);
+
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50/50 transition border-b border-gray-100 last:border-none";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium text-gray-700">${mhs.nim}</td>
+                    <td class="p-4 font-semibold text-gray-900">${mhs.nama}</td>
+                    <td class="p-4 text-center text-gray-600">${mhs.tugas}</td>
+                    <td class="p-4 text-center text-gray-600">${mhs.uts}</td>
+                    <td class="p-4 text-center text-gray-600">${mhs.uas}</td>
+                    <td class="p-4 text-center font-bold text-gray-800">${res.akhir}</td>
+                    <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-bold ${res.warna}">${res.huruf}</span></td>
+                    <td class="p-4 text-center text-xs text-gray-600">${mhs.kehadiran}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="editData(${index})" class="text-blue-600 hover:text-blue-800 p-1 cursor-pointer" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="hapusData(${index})" class="text-rose-600 hover:text-rose-800 p-1 cursor-pointer" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Statistik
+            document.getElementById('statTotal').innerText = dataMahasiswa.length;
+            let rataRataKelas = (totalAkhir / dataMahasiswa.length).toFixed(1);
+            document.getElementById('statRataRata').innerText = rataRataKelas;
+
+            // Simpan ke LocalStorage agar data tersimpan di browser
+            localStorage.setItem('db_mahasiswa', JSON.stringify(dataMahasiswa));
+        }
+
+        function bukaModalTambah() {
+            document.getElementById('modalTitle').innerText = 'Tambah Data Mahasiswa';
+            document.getElementById('formMahasiswa').reset();
+            document.getElementById('editIndex').value = -1;
+            document.getElementById('modalMahasiswa').classList.remove('hidden');
+        }
+
+        function tutupModal() {
+            document.getElementById('modalMahasiswa').classList.add('hidden');
+        }
+
+        function simpanData(event) {
+            event.preventDefault();
+            let index = document.getElementById('editIndex').value;
+            let newData = {
+                nim: document.getElementById('nim').value,
+                nama: document.getElementById('nama').value,
+                tugas: parseFloat(document.getElementById('tugas').value),
+                uts: parseFloat(document.getElementById('uts').value),
+                uas: parseFloat(document.getElementById('uas').value),
+                kehadiran: document.getElementById('kehadiran').value
+            };
+
+            if (index === "-1") {
+                dataMahasiswa.push(newData);
+            } else {
+                dataMahasiswa[index] = newData;
+            }
+
+            tutupModal();
+            renderTabel();
+        }
+
+        function editData(index) {
+            let mhs = dataMahasiswa[index];
+            document.getElementById('modalTitle').innerText = 'Edit Data Mahasiswa';
+            document.getElementById('editIndex').value = index;
+            document.getElementById('nim').value = mhs.nim;
+            document.getElementById('nama').value = mhs.nama;
+            document.getElementById('tugas').value = mhs.tugas;
+            document.getElementById('uts').value = mhs.uts;
+            document.getElementById('uas').value = mhs.uas;
+            document.getElementById('kehadiran').value = mhs.kehadiran;
+            document.getElementById('modalMahasiswa').classList.remove('hidden');
+        }
+
+        function hapusData(index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data mahasiswa ini?")) {
+                dataMahasiswa.splice(index, 1);
+                renderTabel();
+            }
+        }
+
+        function cariMahasiswa() {
+            let keyword = document.getElementById('inputCari').value.toLowerCase();
+            let hasil = dataMahasiswa.filter(m => 
+                m.nama.toLowerCase().includes(keyword) || m.nim.toLowerCase().includes(keyword)
+            );
+            renderTabel(hasil);
+        }
+
+        // Jalankan render saat halaman pertama kali dibuka
+        renderTabel();
+    </script>
+</body>
+</html>
